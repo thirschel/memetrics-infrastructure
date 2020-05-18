@@ -1,0 +1,91 @@
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=vsts&tabs=schema
+stages:
+- stage: Build
+  pool:
+    vmImage: 'ubuntu-16.04'
+  jobs:
+  - job: Build
+    steps:
+    - bash: cp -r . $(Build.ArtifactStagingDirectory)
+      displayName: create artifact
+
+    - task: PublishBuildArtifacts@1
+      displayName: publish artifacts
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+
+- stage: deploy
+  pool:
+    vmImage: 'ubuntu-16.04'
+  variables:
+    - group: Infrastructure
+    - name: environment
+      value: 'dev'
+    - name: terraform_version
+      value: 0.12.24
+    - name: terraform_backend_filename
+      value: $(environment)-tf-state-file
+  jobs:
+    - deployment: deploy
+      displayName: Deploy
+      pool:
+        vmImage: 'Ubuntu-16.04'
+      # creates an environment if it doesn't exist
+      environment: $(environment)
+      strategy:
+        # default deployment strategy, more coming...
+        runOnce:
+          deploy:
+            steps:
+            - bash: |
+                echo 'environment - $(environment)'
+                echo 'Terraform Version - $(terraform_version)'
+                echo 'Terraform backend filename - $(terraform_backend_filename)'
+              displayName: echo build number
+
+            - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
+              displayName: 'use terraform $(terraform_version)'
+              inputs:
+                terraformVersion: $(terraform_version)
+            
+            - bash: |
+                echo '$(AnsibleSecret)' > password
+                chmod 600 password
+                ansible-vault decrypt $(environment).tfvars --vault-password-file password
+              displayName: 'decrypt $(environment).tfvars'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/../drop'
+
+            - bash: 'terraform init -backend-config="storage_account_name=$(TerraformStorageAccountName)" -backend-config="container_name=$(TerraformContainerName)" -backend-config="access_key=$(TerraformStorageAccountKey)" -backend-config="key=$(terraform_backend_filename)"'
+              displayName: 'terraform init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/../drop'
+              env:
+                ARM_CLIENT_ID: $(DevopsClientId)
+                ARM_TENANT_ID: $(DevopsTenantId)
+                ARM_CLIENT_SECRET: $(DevopsClientSecret)
+                ARM_SUBSCRIPTION_ID: $(DevopsSubscriptionId)
+
+            - bash: 'terraform workspace select $(environment) || terraform workspace new $(environment)'
+              displayName: 'terraform workspace select $(environment)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/../drop'
+              env:
+                TF_IN_AUTOMATION: 1
+
+            - bash: 'terraform plan -input=false -var-file=$(environment).tfvars -out=$(Build.BuildNumber).tfplan'
+              displayName: 'terraform plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/../drop'
+              env:
+                ARM_CLIENT_ID: $(DevopsClientId)
+                ARM_TENANT_ID: $(DevopsTenantId)
+                ARM_CLIENT_SECRET: $(DevopsClientSecret)
+                ARM_SUBSCRIPTION_ID: $(DevopsSubscriptionId)
+                TF_WORKSPACE: $(environment)
+
+            - bash: 'terraform apply -input=false $(Build.BuildNumber).tfplan'
+              displayName: 'terraform apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/../drop'
+              env:
+                ARM_CLIENT_ID: $(DevopsClientId)
+                ARM_TENANT_ID: $(DevopsTenantId)
+                ARM_CLIENT_SECRET: $(DevopsClientSecret)
+                ARM_SUBSCRIPTION_ID: $(DevopsSubscriptionId)
+                TF_WORKSPACE: $(environment)
