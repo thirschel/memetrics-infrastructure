@@ -31,7 +31,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       # creates an environment if it doesn't exist
-      environment: $(environment)
+      environment: 'dev'
       strategy:
         # default deployment strategy, more coming...
         runOnce:
