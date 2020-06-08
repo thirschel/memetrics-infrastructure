@@ -87,6 +87,11 @@ resource "azurerm_key_vault" "mm_keyvault" {
       "list",
     ]
   }
+
+  network_acls {
+    default_action = "Deny"
+    bypass         = "AzureServices"
+  }
   tags = var.tags
 }
 

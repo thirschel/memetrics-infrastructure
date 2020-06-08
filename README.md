@@ -64,8 +64,8 @@ accessKey    : <string>
 
 | Input | Value | 
 | ------------- |-------------:|
-| Environment | `Azure Cloud` | No  |
-| Scope Level   | `Subscription`   | No  |
+| Environment | `Azure Cloud` |
+| Scope Level   | `Subscription`   | 
 | Susbcription Id   | The subscription id you created the service principal under   | 
 | Subscription Name   | The subscription name you created the service principal under   | 
 | Service principal id   | The appId from the service principal    | 

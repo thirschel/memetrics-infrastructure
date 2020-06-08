@@ -1,4 +1,9 @@
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=vsts&tabs=schema
+trigger:
+  branches:
+    include:
+    - master
+    
 stages:
 - stage: Build
   pool:
@@ -25,6 +30,10 @@ stages:
       value: 0.12.24
     - name: terraform_backend_filename
       value: $(environment)-tf-state-file
+    - name: resource_group_name
+      value: memetrics-$(environment)
+    - name: key_vault_name
+      value: mm$(environment)-keyvault
   jobs:
     - deployment: deploy
       displayName: Deploy
@@ -42,6 +51,31 @@ stages:
                 echo 'Terraform Version - $(terraform_version)'
                 echo 'Terraform backend filename - $(terraform_backend_filename)'
               displayName: echo build number
+
+            # https://github.com/MicrosoftDocs/azure-docs/issues/38914
+            # Azure Devops is not a trusted Microsoft service and the agents in Azure Devops pool change their IPs weekly
+            # This firewall entry is removed at the end of the deployment
+            - task: PowerShell@2
+              name: GetClientIP
+              displayName: Get Agent IP address
+              inputs:
+                targetType: 'inline'
+                script: |
+                  $response = Invoke-RestMethod -Uri 'https://api.ipify.org/'
+                  Write-Host $response
+                  # ##vso setvariable is required to set the value of ipAddr variable. 
+                  # $ip_address = $response only works local to the task! ** setvariable must be used to pass the variable down the pipeline.**
+                  Write-Host "##vso[task.setvariable variable=ip_address]$response"
+                  $ip_address = $response
+                  Write-Host ip_address is: $ip_address
+
+            - task: AzureCLI@1
+              name: AddFirewallRule
+              displayName: Add Firewall Rule to Azure Key Vault
+              inputs:
+                azureSubscription: 'Visual Studio Enterprise'
+                scriptLocation: 'inlineScript'
+                inlineScript: 'az keyvault network-rule add --resource-group $(resource_group_name) --name $(key_vault_name) --ip-address $(ip_address)'
 
             - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
               displayName: 'use terraform $(terraform_version)'
@@ -89,3 +123,12 @@ stages:
                 ARM_CLIENT_SECRET: $(DevopsClientSecret)
                 ARM_SUBSCRIPTION_ID: $(DevopsSubscriptionId)
                 TF_WORKSPACE: $(environment)
+
+            - task: AzureCLI@1
+              name: RemoveFirewallRule
+              displayName: Remove Firewall Rule from Azure Key Vault
+              inputs:
+                azureSubscription: 'Visual Studio Enterprise'
+                scriptLocation: 'inlineScript'
+                inlineScript: 'az keyvault network-rule remove --resource-group $(resource_group_name) --name $(key_vault_name) --ip-address $(ip_address)/32'
+
