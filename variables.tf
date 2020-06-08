@@ -53,6 +53,10 @@ variable "azurerm_sql_database_requested_service_objective_name" {
   default     = "S2"
 }
 
+variable "agent_ip_address" {
+  description = "Azure Devops is not a trusted Microsoft service and the agents in Azure Devops pool change their IPs weekly. This is the IP address of the agent running this script"
+}
+
 variable "tags" {
   description = "A mapping of tages to assign to the resource. Changing this forces a new resource to be created."
   default = {

@@ -112,6 +112,7 @@ stages:
                 ARM_TENANT_ID: $(DevopsTenantId)
                 ARM_CLIENT_SECRET: $(DevopsClientSecret)
                 ARM_SUBSCRIPTION_ID: $(DevopsSubscriptionId)
+                TF_VAR_agent_ip_address: $(ip_address)/32
                 TF_WORKSPACE: $(environment)
 
             - bash: 'terraform apply -input=false $(Build.BuildNumber).tfplan'
@@ -122,6 +123,7 @@ stages:
                 ARM_TENANT_ID: $(DevopsTenantId)
                 ARM_CLIENT_SECRET: $(DevopsClientSecret)
                 ARM_SUBSCRIPTION_ID: $(DevopsSubscriptionId)
+                TF_VAR_agent_ip_address: $(ip_address)/32
                 TF_WORKSPACE: $(environment)
 
             - task: AzureCLI@1

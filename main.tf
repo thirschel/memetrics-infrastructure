@@ -91,6 +91,10 @@ resource "azurerm_key_vault" "mm_keyvault" {
   network_acls {
     default_action = "Deny"
     bypass         = "AzureServices"
+    ip_rules       = [
+      var.agent_ip_address
+    ]
+
   }
   tags = var.tags
 }
