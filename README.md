@@ -1,4 +1,16 @@
-# MeMetrics Infrastructure
+<h1 align="center">A digitial-life viewing application</h1>
+
+<h3 align="center">
+  <a href="https://memetrics.net/">Visit MeMetrics</a>
+</h3>
+
+<h3 align="center">
+  <a href="https://github.com/thirschel/memetrics-ui/blob/master/ARCHITECTURE.md">Architecture Diagram</a> |
+  <a href="https://github.com/thirschel/memetrics-ui">UI</a> |
+  <a href="https://github.com/thirschel/memetrics-api">API</a> | 
+  <a href="https://github.com/thirschel/memetrics-functions">Functions</a> |
+  <a href="https://github.com/thirschel/memetrics-imessage-updater">iMessage Updater</a>
+</h3>
 
 ### What is this?
 
