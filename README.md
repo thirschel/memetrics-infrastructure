@@ -126,3 +126,20 @@ The `.tfvars` file should contain all the variables declared in `variables.tf` a
 **WSL will be needed to use ansible if on Windows**
 
 eg `ansible-vault encrypt dev.tfvars`
+
+
+### Generate Google refresh tokens
+
+1. Fill in the variables and navigate to `https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope=https://www.googleapis.com/auth/gmail.labels https://www.googleapis.com/auth/gmail.readonly&access_type=offline`
+2. Copy the code in the query paramter in the redirected url
+3. POST https://oauth2.googleapis.com/token
+
+  `x-www-form-urlencoded`
+
+| Name | Value |
+| ------------- |-------------| 
+| code | The code from step 2 |
+| client_id   | The client_id used in step 1   |
+| client_secret   | The secret for the client app  |
+| redirect_uri   | The redirect_uri used in step 1   |
+| grant_type   | `authorization_code`   |
