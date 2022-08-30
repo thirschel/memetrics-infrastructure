@@ -90,5 +90,6 @@ variable "secret_personal_capital_password" {}
 variable "secret_personal_capital_pmdata" {}
 variable "secret_linkedin_username" {}
 variable "secret_linkedin_password" {}
+variable "secret_linkedin_objecturn" {}
 variable "secret_db_username" {}
 variable "secret_db_password" {}

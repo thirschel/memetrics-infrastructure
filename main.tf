@@ -249,6 +249,12 @@ resource "azurerm_key_vault_secret" "linkedin_password" {
   key_vault_id = azurerm_key_vault.mm_keyvault.id
 }
 
+resource "azurerm_key_vault_secret" "linkedin_objecturn" {
+  name         = "LinkedInObjectUrn"
+  value        = var.secret_linkedin_objecturn
+  key_vault_id = azurerm_key_vault.mm_keyvault.id
+}
+
 resource "azurerm_key_vault_secret" "personal_capital_username" {
   name         = "PersonalCapitalUsername"
   value        = var.secret_personal_capital_username
