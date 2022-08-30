@@ -7,7 +7,7 @@ trigger:
 stages:
 - stage: Build
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   jobs:
   - job: Build
     steps:
@@ -21,7 +21,7 @@ stages:
 
 - stage: deploy
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   variables:
     - group: Infrastructure
     - name: environment
@@ -38,7 +38,7 @@ stages:
     - deployment: deploy
       displayName: Deploy
       pool:
-        vmImage: 'Ubuntu-16.04'
+        vmImage: 'Ubuntu-latest'
       # creates an environment if it doesn't exist
       environment: 'dev'
       strategy:
