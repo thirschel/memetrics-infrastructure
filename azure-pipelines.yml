@@ -73,7 +73,7 @@ stages:
               name: AddFirewallRule
               displayName: Add Firewall Rule to Azure Key Vault
               inputs:
-                azureSubscription: 'Visual Studio Enterprise (1)'
+                azureSubscription: 'AzureDevops2022'
                 scriptLocation: 'inlineScript'
                 inlineScript: 'az keyvault network-rule add --resource-group $(resource_group_name) --name $(key_vault_name) --ip-address $(ip_address)'
 
@@ -130,7 +130,7 @@ stages:
               name: RemoveFirewallRule
               displayName: Remove Firewall Rule from Azure Key Vault
               inputs:
-                azureSubscription: 'Visual Studio Enterprise (1)'
+                azureSubscription: 'AzureDevops2022'
                 scriptLocation: 'inlineScript'
                 inlineScript: 'az keyvault network-rule remove --resource-group $(resource_group_name) --name $(key_vault_name) --ip-address $(ip_address)/32'
 

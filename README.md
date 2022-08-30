@@ -49,8 +49,8 @@ __If you already have one created and have the `ObjectId`, `ClientId`, and `Clie
   ```
   appId       : <guid>
   displayName : <name>
-  name        : http://<name>
-  password    : <guid>
+  name        : <name>
+  password    : <string>
   tenant      : <guid>
   objectId    : <guid>
   ```
